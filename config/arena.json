@@ -26,8 +26,8 @@
     {
       "id": "deepseek",
       "provider": "openrouter",
-      "model": "deepseek/deepseek-v4.1-flash",
-      "modelLabel": "DeepSeek V4.1 Flash",
+      "model": "deepseek/deepseek-v4-pro-0813",
+      "modelLabel": "DeepSeek V4 Pro",
       "company": "DeepSeek"
     },
     {
