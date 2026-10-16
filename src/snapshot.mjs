@@ -73,7 +73,7 @@ export function buildSnapshot({market, upBook, downBook, rounds, t0, takenAtMs, 
     market: {
       source: 'Polymarket order book for each side, read through Predictefy at the snapshot. Prices are dollars per share; a winning share pays 1.00.',
       up, down,
-      what_5_dollars_buys_now: {up: costOfBet(upBook, config.stakeUsd, fillOptions), down: costOfBet(downBook, config.stakeUsd, fillOptions)},
+      what_the_bet_buys_now: {stake_usd: config.stakeUsd, up: costOfBet(upBook, config.stakeUsd, fillOptions), down: costOfBet(downBook, config.stakeUsd, fillOptions)},
     },
   };
   const facts = {

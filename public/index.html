@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nine Claudes Arena</title>
+<title>DeepSeek vs Kimi vs MiniMax Arena</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='7' fill='%230d0d0d' stroke='%23e5484d' stroke-width='3'/%3E%3Cg fill='%23e5484d'%3E%3Crect x='8' y='8' width='4' height='4'/%3E%3Crect x='14' y='8' width='4' height='4'/%3E%3Crect x='20' y='8' width='4' height='4'/%3E%3Crect x='8' y='14' width='4' height='4'/%3E%3Crect x='14' y='14' width='4' height='4'/%3E%3Crect x='20' y='14' width='4' height='4'/%3E%3Crect x='8' y='20' width='4' height='4'/%3E%3Crect x='14' y='20' width='4' height='4'/%3E%3Crect x='20' y='20' width='4' height='4'/%3E%3C/g%3E%3C/svg%3E">
 <style>
 :root{
@@ -15,6 +15,8 @@
   --opus-low:#0156a9;--opus-high:#3f8deb;--opus-max:#9cc7ff;
   --sonnet-low:#963202;--sonnet-high:#df5f2d;--sonnet-max:#ffad90;
   --haiku-low:#036948;--haiku-high:#24a476;--haiku-max:#6adeac;
+  /* One hue per model: the validated blue, orange and green slots of the dark palette. */
+  --deepseek:#3f8deb;--kimi:#df5f2d;--minimax:#24a476;
   --baseline:#898781;
   --good:#0ca30c;--crit:#d03b3b;--warn:#fab219;
   --sans:Bahnschrift,"DIN Alternate","Barlow","Segoe UI",system-ui,sans-serif;
@@ -54,7 +56,8 @@ h2{margin:0 0 4px;font-size:19px;font-weight:600}
 
 /* ---- the three-by-three grid ---- */
 .top{display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:14px}
-.matrix{display:grid;grid-template-columns:128px repeat(3,minmax(0,1fr));gap:10px;align-items:stretch}
+.matrix{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:stretch}
+.cell .who{display:flex;align-items:center;gap:10px;margin-bottom:10px}.cell .who i{width:14px;height:14px;border-radius:50%}.cell .who b{font-size:22px;font-weight:600}.cell .who span{color:var(--muted);font-size:13.5px;margin-left:auto;font-family:var(--mono)}
 .colhead{align-self:end;padding:0 4px 2px;display:flex;align-items:baseline;gap:10px}
 .colhead b{font-size:19px;font-weight:600}
 .rowhead{display:flex;flex-direction:column;justify-content:center;gap:6px;padding-left:2px}
@@ -86,7 +89,7 @@ h2{margin:0 0 4px;font-size:19px;font-weight:600}
 
 /* ---- equity small multiples ---- */
 .equity{margin-top:14px}
-.panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:6px}
+.panels{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-top:6px}
 .panel h3{margin:0;font-size:16px;font-weight:600;display:flex;align-items:center;gap:10px}
 .legend{display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:13.5px;color:var(--ink-2)}
 .legend .k{display:inline-flex;align-items:center;gap:6px}
@@ -160,7 +163,7 @@ ol{margin:0;padding-left:24px}ol li{margin:0 0 8px;font-size:15.5px;line-height:
 <body>
 <header>
   <div class="mark"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-  <div><h1>Nine Claudes, one Bitcoin market</h1><div class="tag">Same Predictefy snapshot, same prompt, same $5 rule. Only the model and the effort change.</div></div>
+  <div><h1>DeepSeek vs Kimi vs MiniMax, one Bitcoin market</h1><div class="tag" id="tagline">Same Predictefy snapshot, same prompt, same bet rule. Only the model changes.</div></div>
   <div class="grow"></div>
   <span class="pill"><span class="dot" id="dot"></span><b id="status">Connecting…</b></span>
   <span class="pill">Windows <b id="progress">–</b></span>
@@ -168,7 +171,7 @@ ol{margin:0;padding-left:24px}ol li{margin:0 0 8px;font-size:15.5px;line-height:
 </header>
 <div class="upgrade" id="upgrade"></div>
 <nav>
-  <button data-tab="grid" class="on">The grid</button>
+  <button data-tab="grid" class="on">Scoreboard</button>
   <button data-tab="windows">Every window</button>
   <button data-tab="snapshot">One snapshot</button>
   <button data-tab="rules">Rules and proof</button>
@@ -197,7 +200,7 @@ ol{margin:0;padding-left:24px}ol li{margin:0 0 8px;font-size:15.5px;line-height:
 
   <section id="tab-windows">
     <div class="card">
-      <div style="display:flex;align-items:baseline;gap:14px"><h2>Every window</h2><p class="sub" style="margin:0">Each version's probability that Bitcoin finishes up, its call, and what its bet made. Click a row for the reasons.</p></div>
+      <div style="display:flex;align-items:baseline;gap:14px"><h2>Every window</h2><p class="sub" style="margin:0">Each model's probability that Bitcoin finishes up, its call, and what its bet made. Click a row for the reasons.</p></div>
       <div class="src" style="margin-top:6px" id="checks"></div>
       <div class="tablewrap" style="margin-top:8px"><table id="wintable"></table></div>
       <div class="src" style="margin-top:8px"><b>Bitcoin</b> GET /api/feeds/chainlink/fetchOracleHistory · <b>Up price</b> GET /api/polymarket/fetchOrderBook · <b>Result</b> Polymarket's published resolution, checked against Predictefy's last order book</div>
@@ -209,7 +212,7 @@ ol{margin:0;padding-left:24px}ol li{margin:0 0 8px;font-size:15.5px;line-height:
       <div class="card"><h2 id="snaptitle">The Predictefy calls behind one snapshot</h2><p class="sub" id="snapsub"></p><div class="calls" id="calls"></div>
         <p class="sub" style="margin-top:12px">Docs: <a href="https://docs.predictefy.com" target="_blank" rel="noopener">docs.predictefy.com</a> · order books and reference feeds are in the API reference.</p></div>
       <div class="card"><h2>What came back</h2><p class="sub">The top of both order books and the Chainlink rounds, as Predictefy returned them.</p><div class="scroll" id="rawdata"></div></div>
-      <div class="card"><h2>What all nine were sent</h2><p class="sub" id="promptsub"></p><div class="scroll"><pre id="snapjson"></pre></div></div>
+      <div class="card"><h2>What all three were sent</h2><p class="sub" id="promptsub"></p><div class="scroll"><pre id="snapjson"></pre></div></div>
     </div>
   </section>
 
@@ -217,8 +220,8 @@ ol{margin:0;padding-left:24px}ol li{margin:0 0 8px;font-size:15.5px;line-height:
     <div class="rules">
       <div class="card"><h2>The rules, fixed before the run</h2><p class="sub">Written down first, enforced by code, never changed mid-run.</p><ol id="ruleslist"></ol></div>
       <div>
-        <div class="card"><h2>The one command</h2><p class="sub">Identical for all nine. Only <span class="mono">--model</span> and <span class="mono">--effort</span> change.</p><div class="cmd" id="cmd"></div></div>
-        <div class="card" style="margin-top:14px"><h2>Proof from Claude Code's own output</h2><p class="sub">The model each call reported, and what each version used per call (median).</p><table id="proof"></table></div>
+        <div class="card"><h2>The one request</h2><p class="sub">Identical for all three, through OpenRouter. Only <span class="mono">"model"</span> changes. Thinking is off for every model.</p><div class="cmd" id="cmd"></div></div>
+        <div class="card" style="margin-top:14px"><h2>Proof from OpenRouter's own replies</h2><p class="sub">The model each reply reported, and what each model used per call (median).</p><table id="proof"></table></div>
         <div class="card" style="margin-top:14px"><h2>What this costs to run</h2><p class="sub" id="costsub"></p><div class="cost" id="cost"></div></div>
       </div>
     </div>
@@ -229,8 +232,8 @@ ol{margin:0;padding-left:24px}ol li{margin:0 0 8px;font-size:15.5px;line-height:
 <script>
 const $ = s => document.querySelector(s);
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-const MODELS = [['opus', 'Opus 5.5'], ['sonnet', 'Sonnet 5.5'], ['haiku', 'Haiku 5.5']];
-const EFFORTS = ['low', 'high', 'max'];
+// The contestants come from the run itself: [id, label] in the config's order. Each id has its own colour variable.
+const MODELS_OF = s => s.versions.map(v => [v.id, v.modelLabel]);
 const color = id => getComputedStyle(document.documentElement).getPropertyValue('--' + id).trim();
 const pct = (v, d = 1) => v == null ? '–' : (v * 100).toFixed(d) + '%';
 const money = v => v == null ? '–' : (v < 0 ? '−$' : '+$') + Math.abs(v).toFixed(2);
@@ -255,24 +258,23 @@ function renderHeader(s) {
   $('#progress').textContent = `${r.settled} of ${r.target} settled` + (r.counted > r.settled ? ` · ${r.counted - r.settled} open` : '') + (r.voided ? ` · ${r.voided} void` : '');
   $('#credits').textContent = num(s.credits.total);
   $('#note').textContent = replay ? `Saved state of ${s.generatedAt.slice(0, 16).replace('T', ' ')} UTC` : r.pausedUntil ? `Paused: ${r.pauseReason}` : `Started ${r.startedAt ? r.startedAt.slice(11, 16) : '–'} UTC${r.expectedEndAt ? ' · last window closes ' + r.expectedEndAt.slice(11, 16) + ' UTC' : ''}`;
+  $('#tagline').textContent = `Same Predictefy snapshot, same prompt, same $${s.rules.stakeUsd} bet from a $${num(s.rules.budgetUsd)} paper bankroll. Only the model changes. Thinking off for all three.`;
 }
 
 function renderMatrix(s) {
   const root = $('#matrix'); root.textContent = '';
   const band = s.luck?.coinFlip;
-  root.append(el('div'));
-  for (const e of EFFORTS) { const h = el('div', 'colhead'); h.append(el('span', 'label', 'effort'), el('b', null, e)); root.append(h); }
   const best = Math.max(...s.versions.map(v => v.score.hitRate ?? -1));
-  for (const [m, name] of MODELS) {
-    const rh = el('div', 'rowhead'); rh.append(el('b', null, name)); const ramp = el('div', 'ramp'); for (const e of EFFORTS) { const i = el('i'); i.style.background = color(`${m}-${e}`); ramp.append(i); } rh.append(ramp); root.append(rh);
-    for (const e of EFFORTS) {
-      const v = s.versions.find(x => x.id === `${m}-${e}`); const sc = v?.score || {};
-      const cell = el('div', 'cell' + (sc.hitRate != null && sc.hitRate === best && sc.windows ? ' lead' : '')); cell.dataset.version = `${m}-${e}`;
+  for (const [m, name] of MODELS_OF(s)) {
+    {
+      const v = s.versions.find(x => x.id === m); const sc = v?.score || {};
+      const cell = el('div', 'cell' + (sc.hitRate != null && sc.hitRate === best && sc.windows ? ' lead' : '')); cell.dataset.version = m;
+      const who = el('div', 'who'); const dot = el('i'); dot.style.background = color(m); who.append(dot, el('b', null, name), el('span', null, v?.model || '')); cell.append(who);
       const hit = el('div', 'hit'); hit.append(el('b', 'heroNum', sc.windows ? pct(sc.hitRate) : '–'), el('span', null, sc.windows ? `right way ${num(sc.hits, sc.hits % 1 ? 1 : 0)} of ${sc.windows}` : 'no results yet'));
       const meter = el('div', 'meter');
       if (band) { const b = el('div', 'band'); b.style.left = band.lowRate * 100 + '%'; b.style.width = (band.highRate - band.lowRate) * 100 + '%'; meter.append(b); }
       const half = el('div', 'half'); half.style.left = '50%'; meter.append(half);
-      if (sc.windows) { const pin = el('div', 'pin'); pin.style.left = sc.hitRate * 100 + '%'; pin.style.background = color(`${m}-${e}`); meter.append(pin); }
+      if (sc.windows) { const pin = el('div', 'pin'); pin.style.left = sc.hitRate * 100 + '%'; pin.style.background = color(m); meter.append(pin); }
       meter.title = band ? `Shaded: where a coin flip lands 19 times in 20 over ${band.n} windows (${pct(band.lowRate, 0)} to ${pct(band.highRate, 0)})` : '';
       const stats = el('div', 'stats');
       const stat = (label, node) => { const d = el('div'); d.append(el('small', null, label)); const b = el('b', 'num'); if (typeof node === 'string') b.textContent = node; else b.append(...node); d.append(b); stats.append(d); };
@@ -282,7 +284,7 @@ function renderMatrix(s) {
       stat('Median', secs(sc.medianAnswerSecondsAll));
       cell.append(hit, meter, stats);
       if (sc.windows && sc.answered < sc.windows) { const w = el('div', 'when'); w.textContent = sc.answered ? `When it answered in time: ${pct(sc.answeredHitRate, 0)} right way (${num(sc.answeredHits, sc.answeredHits % 1 ? 1 : 0)} of ${sc.answered}), Brier ${sc.answeredBrier.toFixed(3)}` : 'It never answered in time'; cell.append(w); }
-      cell.title = v ? `${name}, ${e} effort. ${sc.betsPlaced ?? 0} bets placed, ${sc.lateAll ?? 0} answers too late to bet, ${sc.noAnswerAll ?? 0} with no answer in time.` : '';
+      cell.title = v ? `${name}. ${sc.betsPlaced ?? 0} bets placed, ${sc.lateAll ?? 0} answers too late to bet, ${sc.noAnswerAll ?? 0} with no answer in time.` : '';
       root.append(cell);
     }
   }
@@ -298,14 +300,14 @@ function renderSide(s) {
   if (!s.luck) { l.append(el('p', null, 'No settled windows yet.')); return; }
   const k = s.luck, c = k.coinFlip;
   if (k.windows < 10) { l.append(el('p', null, `Only ${k.windows} window${k.windows === 1 ? '' : 's'} settled so far. With so few, any hit rate from 0% to 100% is ordinary luck.`)); return; }
-  const p1 = el('p'); p1.append('Over ', el('b', null, `${k.windows} windows`), ', a coin flip lands between ', el('b', null, `${pct(c.lowRate, 0)} and ${pct(c.highRate, 0)}`), ` 19 times in 20. A version needs ${c.needHitsToBeat} right (${pct(c.needRateToBeat, 0)}) before it stands out.`); l.append(p1);
-  const p2 = el('p'); p2.append('The best of nine coin flips would average ', el('b', null, pct(k.bestOfNine.expectedRate, 0)), '. So a top score near that proves nothing.'); l.append(p2);
+  const p1 = el('p'); p1.append('Over ', el('b', null, `${k.windows} windows`), ', a coin flip lands between ', el('b', null, `${pct(c.lowRate, 0)} and ${pct(c.highRate, 0)}`), ` 19 times in 20. A model needs ${c.needHitsToBeat} right (${pct(c.needRateToBeat, 0)}) before it stands out.`); l.append(p1);
+  const p2 = el('p'); p2.append(`The best of ${s.versions.length} coin flips would average `, el('b', null, pct(k.bestOfNine.expectedRate, 0)), '. So a top score near that proves nothing.'); l.append(p2);
   const out = k.versusFavourite.filter(x => !x.insideLuck).length;
-  const p3 = el('p'); p3.append(el('b', null, `${k.pairsOutsideLuck} of ${k.pairs.length}`), ' gaps between two versions are bigger than luck explains, and ', el('b', null, `${out} of 9`), ' versions differ from the market favourite by more than luck.'); l.append(p3);
+  const p3 = el('p'); p3.append(el('b', null, `${k.pairsOutsideLuck} of ${k.pairs.length}`), ' gaps between two models are bigger than luck explains, and ', el('b', null, `${out} of ${s.versions.length}`), ' models differ from the market favourite by more than luck.'); l.append(p3);
   renderMarket(s);
 }
 
-// How the nine versions' answers and bets compare with the favourite: the side priced above 50 cents at the snapshot.
+// How the models' answers and bets compare with the favourite: the side priced above 50 cents at the snapshot.
 function renderMarket(s) {
   const box = $('#market'); box.textContent = '';
   const m = s.versusMarket;
@@ -314,35 +316,36 @@ function renderMarket(s) {
   const g = el('div', 'base'); g.style.marginTop = '9px';
   for (const h of ['Bets', 'Placed', 'Won', 'Profit']) g.append(el('span', 'h', h));
   const all = {bets: m.withFavourite.bets + m.againstFavourite.bets, won: m.withFavourite.won + m.againstFavourite.won, pnlUsd: m.withFavourite.pnlUsd + m.againstFavourite.pnlUsd};
-  for (const [label, t] of [['With the favourite', m.withFavourite], ['Against it', m.againstFavourite], ['All nine, every bet', all]]) { g.append(el('span', 'n', label), el('b', 'num', String(t.bets)), el('b', 'num', String(t.won))); const b = el('b', 'num'); if (t.bets) b.append(tri(t.pnlUsd), document.createTextNode(money(t.pnlUsd))); else b.textContent = '–'; g.append(b); }
+  for (const [label, t] of [['With the favourite', m.withFavourite], ['Against it', m.againstFavourite], [`All ${s.versions.length}, every bet`, all]]) { g.append(el('span', 'n', label), el('b', 'num', String(t.bets)), el('b', 'num', String(t.won))); const b = el('b', 'num'); if (t.bets) b.append(tri(t.pnlUsd), document.createTextNode(money(t.pnlUsd))); else b.textContent = '–'; g.append(b); }
   box.append(g);
 }
 
-function seriesFor(s, m) {
-  const out = EFFORTS.map(e => { const v = s.versions.find(x => x.id === `${m}-${e}`); return {key: `${m}-${e}`, label: e, color: color(`${m}-${e}`), width: 2.25, points: v?.equity || []}; });
+function seriesFor(s) {
+  const out = MODELS_OF(s).map(([m, name]) => { const v = s.versions.find(x => x.id === m); return {key: m, label: name, color: color(m), width: 2.5, points: v?.equity || []}; });
   for (const b of s.baselines) out.push({key: b.id, label: b.label, color: color('baseline'), width: 1.25, points: b.equity, baseline: true});
   return out;
 }
 
 function renderEquity(s) {
   const legend = $('#legend'); legend.textContent = '';
-  for (const e of EFFORTS) { const k = el('span', 'k'); for (const [m] of MODELS) { const i = el('i'); i.style.background = color(`${m}-${e}`); i.style.width = '9px'; k.append(i); } k.append(document.createTextNode(e + ' effort')); legend.append(k); }
+  for (const [m, name] of MODELS_OF(s)) { const k = el('span', 'k'); const i = el('i'); i.style.background = color(m); k.append(i, document.createTextNode(name)); legend.append(k); }
   const kb = el('span', 'k'); const ib = el('i'); ib.style.background = color('baseline'); ib.style.height = '2px'; kb.append(ib, document.createTextNode('the three baselines')); legend.append(kb);
   const panels = $('#panels'); panels.textContent = '';
   const all = [...s.versions, ...s.baselines].flatMap(v => v.equity.map(p => p.equityUsd));
   const budget = s.rules.budgetUsd;
-  let lo = Math.min(budget, ...all), hi = Math.max(budget, ...all); const pad = Math.max(4, (hi - lo) * 0.12); lo = Math.floor((lo - pad) / 5) * 5; hi = Math.ceil((hi + pad) / 5) * 5;
-  const n = Math.max(s.run.target || 72, s.run.counted || 0, 1);
-  const W = 590, H = 250, L = 44, R = 92, T = 12, B = 26;
+  let lo = Math.min(budget, ...all), hi = Math.max(budget, ...all); const pad = Math.max(20, (hi - lo) * 0.12); lo = Math.floor((lo - pad) / 10) * 10; hi = Math.ceil((hi + pad) / 10) * 10;
+  const n = Math.max(s.run.target || 36, s.run.counted || 0, 1);
+  // One chart: the three models and the three plain rules on the same axes.
+  const W = 1700, H = 330, L = 60, R = 190, T = 12, B = 28;
   const x = i => L + (W - L - R) * i / n, y = v => T + (H - T - B) * (1 - (v - lo) / (hi - lo));
-  for (const [m, name] of MODELS) {
-    const panel = el('div', 'panel'); const h = el('h3'); const ramp = el('div', 'ramp'); for (const e of EFFORTS) { const i = el('i'); i.style.background = color(`${m}-${e}`); i.style.width = '14px'; ramp.append(i); } h.append(document.createTextNode(name), ramp); panel.append(h);
-    const ns = 'http://www.w3.org/2000/svg'; const svg = document.createElementNS(ns, 'svg'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', `${name}: paper equity by window for low, high and max effort, with three baselines`);
+  {
+    const panel = el('div', 'panel');
+    const ns = 'http://www.w3.org/2000/svg'; const svg = document.createElementNS(ns, 'svg'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', 'Paper bankroll by window for each model, with three baselines');
     const add = (tag, attrs, text) => { const e = document.createElementNS(ns, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (text != null) e.textContent = text; svg.append(e); return e; };
-    const ticks = []; const stepY = (hi - lo) <= 40 ? 10 : (hi - lo) <= 100 ? 20 : 50; for (let v = Math.ceil(lo / stepY) * stepY; v <= hi; v += stepY) ticks.push(v);
-    for (const v of ticks) { add('line', {x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: v === budget ? color('axis') : color('grid'), 'stroke-width': 1}); add('text', {x: L - 7, y: y(v) + 4, 'text-anchor': 'end'}, '$' + v); }
-    for (const i of [0, 12, 24, 36, 48, 60, 72].filter(i => i <= n)) add('text', {x: x(i), y: H - 7, 'text-anchor': 'middle'}, i === 0 ? 'start' : String(i));
-    const series = seriesFor(s, m);
+    const span = hi - lo; const stepY = span <= 40 ? 10 : span <= 100 ? 20 : span <= 250 ? 50 : span <= 500 ? 100 : 200; const ticks = []; for (let v = Math.ceil(lo / stepY) * stepY; v <= hi; v += stepY) ticks.push(v);
+    for (const v of ticks) { add('line', {x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: v === budget ? color('axis') : color('grid'), 'stroke-width': 1}); add('text', {x: L - 8, y: y(v) + 4, 'text-anchor': 'end'}, '$' + num(v)); }
+    for (const i of [0, 6, 12, 18, 24, 30, 36, 42, 48].filter(i => i <= n)) add('text', {x: x(i), y: H - 7, 'text-anchor': 'middle'}, i === 0 ? 'start' : String(i));
+    const series = seriesFor(s);
     const ends = [];
     for (const sr of [...series].reverse()) {
       if (sr.points.length < 1) continue;
@@ -356,7 +359,7 @@ function renderEquity(s) {
     for (const e of ends) { const ly = e.y2 ?? e.y; if (e.y2 != null) add('line', {x1: e.x + 6, y1: e.y, x2: e.x + 12, y2: ly, stroke: color('quiet'), 'stroke-width': 1}); add('text', {x: e.x + 14, y: ly + 4, class: 'end'}, e.text); }
     const cross = add('line', {x1: 0, x2: 0, y1: T, y2: H - B, stroke: color('ink-2'), 'stroke-width': 1, opacity: 0});
     const hit = add('rect', {x: L, y: T, width: W - L - R, height: H - T - B, fill: 'transparent'});
-    hit.addEventListener('pointermove', ev => { const box = svg.getBoundingClientRect(); const px = (ev.clientX - box.left) / box.width * W; const i = Math.max(0, Math.min(Math.max(...series.map(q => q.points.length - 1)), Math.round((px - L) / (W - L - R) * n))); cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('opacity', .5); showTip(ev, i === 0 ? 'Start' : `After window ${i}`, series.map(q => ({color: q.color, label: q.baseline ? q.label : `${name} ${q.label}`, value: q.points[Math.min(i, q.points.length - 1)] ? plain(q.points[Math.min(i, q.points.length - 1)].equityUsd) : '–'}))); });
+    hit.addEventListener('pointermove', ev => { const box = svg.getBoundingClientRect(); const px = (ev.clientX - box.left) / box.width * W; const i = Math.max(0, Math.min(Math.max(...series.map(q => q.points.length - 1)), Math.round((px - L) / (W - L - R) * n))); cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('opacity', .5); showTip(ev, i === 0 ? 'Start' : `After window ${i}`, series.map(q => ({color: q.color, label: q.label, value: q.points[Math.min(i, q.points.length - 1)] ? plain(q.points[Math.min(i, q.points.length - 1)].equityUsd) : '–'}))); });
     hit.addEventListener('pointerleave', () => { cross.setAttribute('opacity', 0); hideTip(); });
     panel.append(svg); panels.append(panel);
   }
@@ -372,13 +375,12 @@ function renderWindows(s) {
   const k = s.resultChecks, checks = $('#checks'); checks.textContent = '';
   if (k?.settled) checks.append(el('b', null, 'Cross-check'), ` Predictefy's last order book named the published winner in ${k.bookAgrees} of ${k.bookKnown} windows. Its Chainlink feed pointed the same way in ${k.chainlinkAgrees} of ${k.chainlinkKnown}: it is Chainlink's on-chain feed, not the data stream the market settles on.`);
   const t = $('#wintable'); t.textContent = '';
-  const h1 = el('tr'); for (let i = 0; i < 6; i++) h1.append(el('th', 'model'));
-  for (const [m, name] of MODELS) { const th = el('th', 'model'); th.colSpan = 3; const i = el('i'); i.style.background = color(`${m}-high`); th.append(i, document.createTextNode(name)); h1.append(th); }
+  const models = MODELS_OF(s), cols = 6 + models.length;
   const h2 = el('tr'); for (const [c, l] of [['#', 'l'], ['UTC', 'l'], ['BTC at open', ''], ['Move at ' + clockOf(s.rules.snapshotSecond), ''], ['Up price', ''], ['Result', 'l']]) h2.append(el('th', l, c));
-  for (let k = 0; k < 3; k++) for (const e of EFFORTS) h2.append(el('th', null, e));
-  t.append(h1, h2);
+  for (const [m, name] of models) { const th = el('th', 'model'); const i = el('i'); i.style.background = color(m); th.append(i, document.createTextNode(name)); h2.append(th); }
+  t.append(h2);
   const rows = [...s.windows].reverse();
-  if (!rows.length) { const tr = el('tr'); const td = el('td', 'empty', 'The first window has not been played yet.'); td.colSpan = 15; tr.append(td); t.append(tr); return; }
+  if (!rows.length) { const tr = el('tr'); const td = el('td', 'empty', 'The first window has not been played yet.'); td.colSpan = cols; tr.append(td); t.append(tr); return; }
   for (const w of rows) {
     const tr = el('tr', 'win' + (w.void ? ' void' : '')); tr.dataset.t0 = w.t0;
     tr.append(el('td', 'l num', w.void ? '×' : String(w.countedIndex ?? '·')), el('td', 'l num', `${utc(w.opensAt)}–${utc(w.closesAt)}`));
@@ -386,8 +388,8 @@ function renderWindows(s) {
     tr.append(el('td', 'num', w.snapshot ? (w.snapshot.change >= 0 ? '+' : '−') + '$' + Math.abs(w.snapshot.change).toFixed(2) : '–'));
     tr.append(el('td', 'num', w.snapshot?.upMid != null ? (w.snapshot.upMid * 100).toFixed(1) + '¢' : '–'));
     const res = el('td', 'l'); if (w.void) res.textContent = 'thrown out'; else if (w.result) { const r = el('span', 'res'); r.append(el('span', 'arrow', w.result.winner === 'up' ? '▲' : '▼'), document.createTextNode(w.result.winner === 'up' ? 'Up' : 'Down')); res.append(r); } else res.textContent = w.status === 'open' ? 'in play' : 'waiting'; tr.append(res);
-    for (const [m] of MODELS) for (const e of EFFORTS) {
-      const a = w.answers[`${m}-${e}`]; const td = el('td', 'v');
+    for (const [m] of models) {
+      const a = w.answers[m]; const td = el('td', 'v');
       if (!a) { td.append(el('span', 'p', '–')); tr.append(td); continue; }
       const p = el('span', 'p num', a.pUp != null ? a.pUp.toFixed(2) : a.callStatus === 'blocked' ? 'blocked' : a.callStatus === 'error' ? 'failed' : a.callStatus === 'pending' || (!a.status && w.status === 'open') ? '…' : 'no answer');
       td.append(p);
@@ -399,11 +401,11 @@ function renderWindows(s) {
     tr.addEventListener('click', () => { openRow = openRow === w.t0 ? null : w.t0; renderWindows(state); });
     t.append(tr);
     if (openRow === w.t0) {
-      const d = el('tr', 'detail'); const td = el('td'); td.colSpan = 15;
+      const d = el('tr', 'detail'); const td = el('td'); td.colSpan = cols;
       const head = el('div', 'src'); head.style.marginBottom = '8px'; head.textContent = `${w.title || w.slug} · snapshot ${w.snapshot?.secondsIn ?? '–'} s in · Up ${w.snapshot?.upBid ?? '–'}/${w.snapshot?.upAsk ?? '–'} · Down ${w.snapshot?.downBid ?? '–'}/${w.snapshot?.downAsk ?? '–'}` + (w.result ? ` · Polymarket: price to beat $${num(w.result.priceToBeat, 2)}, final $${num(w.result.finalPrice, 2)} · Predictefy's last book says ${w.result.bookWinner || 'n/a'} · credits ${w.credits}` : '') + (w.void ? ` · thrown out: ${w.void.reason}` : '');
       td.append(head);
       const g = el('div', 'reasons');
-      for (const [m, name] of MODELS) for (const e of EFFORTS) { const a = w.answers[`${m}-${e}`]; const box = el('div'); box.append(el('b', null, `${name} ${e}: `), document.createTextNode(a?.reason || a?.noBetReason || 'no answer')); const meta = el('span', 'meta'); meta.textContent = a ? `${a.answerSeconds != null ? a.answerSeconds.toFixed(1) + ' s' + (a.secondsIntoWindow != null ? `, answered ${clockOf(Math.round(a.secondsIntoWindow))} into the window` : '') : 'no answer'}${a.thinkingTokens != null ? ' · ' + num(a.thinkingTokens) + ' thinking tokens' : ''}${a.bet ? ` · ${a.bet.side} ${a.bet.shares} sh @ ${a.bet.avgPrice.toFixed(3)} (snapshot ask ${a.bet.snapshotAsk}) fee $${a.bet.feeUsd.toFixed(3)}` : a.noBetReason ? ' · ' + a.noBetReason : ''}` : ''; box.append(meta); g.append(box); }
+      for (const [m, name] of models) { const a = w.answers[m]; const box = el('div'); box.append(el('b', null, `${name}: `), document.createTextNode(a?.reason || a?.noBetReason || 'no answer')); const meta = el('span', 'meta'); meta.textContent = a ? `${a.answerSeconds != null ? a.answerSeconds.toFixed(1) + ' s' + (a.secondsIntoWindow != null ? `, answered ${clockOf(Math.round(a.secondsIntoWindow))} into the window` : '') : 'no answer'}${a.thinkingTokens != null ? ' · ' + num(a.thinkingTokens) + ' thinking tokens' : ''}${a.bet ? ` · ${a.bet.side} ${a.bet.shares} sh @ ${a.bet.avgPrice.toFixed(3)} (snapshot ask ${a.bet.snapshotAsk}) fee $${a.bet.feeUsd.toFixed(3)}` : a.noBetReason ? ' · ' + a.noBetReason : ''}` : ''; box.append(meta); g.append(box); }
       td.append(g); d.append(td); t.append(d);
     }
   }
@@ -430,7 +432,7 @@ function renderSnapshot(s) {
       box.append(t); lad.append(box);
     }
     raw.append(lad);
-    const b = i.snapshot?.market?.what_5_dollars_buys_now?.up; if (b?.available) { const p = el('p', 'fillnote'); p.append('A $5 buy of Up walks the asks from the cheapest: ', el('b', null, `${b.shares} shares at ${(b.average_price * 100).toFixed(1)}¢`), `, fee $${b.fee_usd.toFixed(3)}, total $${b.cost_usd.toFixed(2)}. It pays $${b.pays_if_right_usd.toFixed(2)} if Up wins.`); raw.append(p); }
+    const b = i.snapshot?.market?.what_the_bet_buys_now?.up; if (b?.available) { const p = el('p', 'fillnote'); p.append(`A $${s.rules.stakeUsd} buy of Up walks the asks from the cheapest: `, el('b', null, `${b.shares} shares at ${(b.average_price * 100).toFixed(1)}¢`), `, fee $${b.fee_usd.toFixed(3)}, total $${b.cost_usd.toFixed(2)}. It pays $${b.pays_if_right_usd.toFixed(2)} if Up wins.`); raw.append(p); }
     raw.append(el('div', 'label', 'Chainlink BTC/USD rounds')); const pre = el('pre'); pre.style.marginTop = '6px'; pre.textContent = [...i.raw.chainlinkRounds].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 14).map(r => `${new Date(r.updatedAt * 1000).toISOString().slice(11, 19)}  $${r.answer.toFixed(2)}${r.updatedAt <= i.t0 ? '' : '   (after the open)'}`).join('\n'); raw.append(pre);
   }
   $('#promptsub').textContent = `The snapshot inside the prompt. SHA-256 of the full prompt: ${(i.promptSha256 || '').slice(0, 16)}…, identical for all nine.`;

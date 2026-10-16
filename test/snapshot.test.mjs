@@ -26,8 +26,8 @@ test('snapshot: the open reference is the last Chainlink round at or before the 
   assert.equal(snapshot.bitcoin.one_minute_changes_usd.length, 10);
   assert.equal(snapshot.bitcoin.change_since_open_usd, Math.round((snapshot.bitcoin.latest_value.usd - open.answer) * 100) / 100);
   assert.equal(snapshot.market.up.best_ask, 0.57); assert.equal(snapshot.market.up.mid, 0.565); assert.equal(snapshot.market.down.best_bid, 0.43);
-  assert.equal(snapshot.market.what_5_dollars_buys_now.up.available, true);
-  assert.ok(snapshot.market.what_5_dollars_buys_now.up.cost_usd <= 5);
+  assert.equal(snapshot.market.what_the_bet_buys_now.up.available, true);
+  assert.ok(snapshot.market.what_the_bet_buys_now.up.cost_usd <= snapshot.market.what_the_bet_buys_now.stake_usd);
   assert.equal(facts.upMid, 0.565);
 });
 
