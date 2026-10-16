@@ -6,7 +6,7 @@ export const SYSTEM_PROMPT = 'You are one contestant in a forecasting test. You 
 export function buildPrompt({market, snapshot, config}) {
   const always = config.betRule === 'always';
   const lines = [
-    `This is one round of a test. ${config.contestants.length} AI models from different companies receive this exact message at the same moment and answer separately. None of them can see the others.`,
+    `This is one round of a test. ${config.contestants?.length || 'Several'} AI models from different companies receive this exact message at the same moment and answer separately. None of them can see the others.`,
     '',
     'THE MARKET',
     `Polymarket's 5-minute market "${market.title}". A share of the winning side pays $1.00 when the window ends; a share of the losing side pays nothing.`,
