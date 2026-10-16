@@ -435,29 +435,26 @@ function renderSnapshot(s) {
     const b = i.snapshot?.market?.what_the_bet_buys_now?.up; if (b?.available) { const p = el('p', 'fillnote'); p.append(`A $${s.rules.stakeUsd} buy of Up walks the asks from the cheapest: `, el('b', null, `${b.shares} shares at ${(b.average_price * 100).toFixed(1)}¢`), `, fee $${b.fee_usd.toFixed(3)}, total $${b.cost_usd.toFixed(2)}. It pays $${b.pays_if_right_usd.toFixed(2)} if Up wins.`); raw.append(p); }
     raw.append(el('div', 'label', 'Chainlink BTC/USD rounds')); const pre = el('pre'); pre.style.marginTop = '6px'; pre.textContent = [...i.raw.chainlinkRounds].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 14).map(r => `${new Date(r.updatedAt * 1000).toISOString().slice(11, 19)}  $${r.answer.toFixed(2)}${r.updatedAt <= i.t0 ? '' : '   (after the open)'}`).join('\n'); raw.append(pre);
   }
-  $('#promptsub').textContent = `The snapshot inside the prompt. SHA-256 of the full prompt: ${(i.promptSha256 || '').slice(0, 16)}…, identical for all nine.`;
+  $('#promptsub').textContent = `The snapshot inside the prompt. SHA-256 of the full prompt: ${(i.promptSha256 || '').slice(0, 16)}…, identical for all ${s.versions.length}.`;
   $('#snapjson').textContent = JSON.stringify(i.snapshot, null, 1);
 }
 
 function renderRules(s) {
   const ol = $('#ruleslist'); ol.textContent = ''; for (const r of s.rules.text) ol.append(el('li', null, r));
   $('#cmd').textContent = s.command || '';
-  const t = $('#proof'); t.textContent = ''; const hr = el('tr'); for (const [c, l] of [['Version', 'l'], ['Model reported', 'l'], ['Calls', ''], ['Tokens in', ''], ['Thinking', ''], ['Answer', ''], ['List price', '']]) hr.append(el('th', l, c)); t.append(hr);
-  for (const v of s.versions) { const tr = el('tr'); tr.append(el('td', 'l', `${v.modelLabel} ${v.effort}`), el('td', 'l mono', v.proof.modelsReported.join(', ') || '–'), el('td', 'num', `${v.proof.ok}/${v.proof.calls}`), el('td', 'num', num(v.proof.medianInputTokens)), el('td', 'num', num(v.proof.medianThinkingTokens)), el('td', 'num', secs(v.score.medianAnswerSecondsAll)), el('td', 'num', v.proof.ok ? plain(v.proof.listPriceUsd) : '–')); t.append(tr); }
+  const t = $('#proof'); t.textContent = ''; const hr = el('tr'); for (const [c, l] of [['Model', 'l'], ['Model reported', 'l'], ['Calls', ''], ['Tokens in', ''], ['Thinking', ''], ['Answer', ''], ['Cost', '']]) hr.append(el('th', l, c)); t.append(hr);
+  for (const v of s.versions) { const tr = el('tr'); tr.append(el('td', 'l', v.modelLabel), el('td', 'l mono', v.proof.modelsReported.join(', ') || '–'), el('td', 'num', `${v.proof.ok}/${v.proof.calls}`), el('td', 'num', num(v.proof.medianInputTokens)), el('td', 'num', num(v.proof.medianThinkingTokens)), el('td', 'num', secs(v.score.medianAnswerSecondsAll)), el('td', 'num', v.proof.ok ? '$' + (v.proof.listPriceUsd || 0).toFixed(4) : '–')); t.append(tr); }
   const c = s.credits; $('#costsub').textContent = `Market lookup 1 credit, each order book 5, Chainlink rounds 2. Predictefy's free plan gives ${num(c.freePlan.monthlyCredits)} credits a month.`;
   const cost = $('#cost'); cost.textContent = '';
   const tile = (label, value, note) => { const d = el('div'); d.append(el('small', null, label), el('b', 'num', value), el('span', null, note)); cost.append(d); };
   tile('This run', num(c.total), `${num(c.calls)} Predictefy calls`);
   tile('Per window', c.perWindow == null ? '–' : num(c.perWindow, 0), `snapshot ${num(c.byKind.snapshot)} · fills ${num(c.byKind.fills)} · results ${num(c.byKind.results)}`);
   tile('Free plan lasts', c.freePlan.windowsPerMonth == null ? '–' : num(c.freePlan.windowsPerMonth) + ' windows', c.freePlan.hoursPerMonth == null ? '' : `about ${c.freePlan.hoursPerMonth} hours of this test a month`);
-  tile('Claude calls', num(s.claudeCalls.total), `${s.claudeCalls.ok} answered · ${s.claudeCalls.noAnswer} ran out of time · ${s.claudeCalls.blocked} blocked`);
-  // The calls run on a Claude plan, so there is no bill; this is what Claude Code itself reports each finished call
-  // would cost at API list prices. Calls stopped at the deadline report nothing and are not in the total.
-  if (s.claudeCalls.listPriceUsd) {
-    const maxEffort = s.versions.filter(v => v.effort === 'max').reduce((sum, v) => sum + (v.proof.listPriceUsd || 0), 0);
-    tile('Claude at list prices', plain(s.claudeCalls.listPriceUsd), `Claude Code's own cost figure for the ${s.claudeCalls.ok} answers that arrived. The three max-effort versions: ${plain(maxEffort)} of it.`);
-    cost.lastChild.classList.add('wide');
-  }
+  tile('Model calls', num(s.claudeCalls.total), `${s.claudeCalls.ok} answered · ${s.claudeCalls.noAnswer} ran out of time · ${s.claudeCalls.blocked} blocked`);
+  // What OpenRouter charged, from the cost on every reply (usage.cost), split by model.
+  const usd4 = v => '$' + (v || 0).toFixed(v >= 1 ? 2 : 4);
+  tile('OpenRouter bill', usd4(s.claudeCalls.listPriceUsd), s.versions.map(v => `${v.modelLabel} ${usd4(v.proof.listPriceUsd)}`).join(' · '));
+  cost.lastChild.classList.add('wide');
 }
 
 function render() {
