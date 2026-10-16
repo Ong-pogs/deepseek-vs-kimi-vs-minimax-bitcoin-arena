@@ -2,9 +2,11 @@
 // "model" differs:
 //
 //   POST https://openrouter.ai/api/v1/chat/completions
-//   {model, messages: [system, user], max_tokens, reasoning: {max_tokens}, usage: {include: true}}
+//   {model, messages: [system, user], max_tokens, reasoning: {enabled: false}, usage: {include: true}}
 //
-// No tools, no conversation history, no web search: one system message, one user message, one reply.
+// No tools, no conversation history, no web search, no thinking: one system message, one user message, one reply.
+// (Thinking is off for every model, at the owner's request: faster and cheaper. settings.reasoningTokens turns it
+// back on with that cap, for every model alike.)
 // The reply carries what the call cost (usage.cost, in dollars) and which provider served it.
 // Resolves with a record shaped like the Claude Code records of the earlier arena. Never rejects.
 import {writeFileSync, mkdirSync} from 'node:fs';
@@ -17,15 +19,16 @@ export function requestBody({model, system, prompt, settings}) {
     model,
     messages: [{role: 'system', content: system}, {role: 'user', content: prompt}],
     max_tokens: settings.maxTokens,
-    reasoning: {max_tokens: settings.reasoningTokens},
+    reasoning: reasoningOf(settings),
     temperature: settings.temperature,
     usage: {include: true},
   };
 }
+const reasoningOf = settings => (settings.reasoningTokens ? {max_tokens: settings.reasoningTokens} : {enabled: false});
 
 // The request as a person would send it, for the notes, the dashboard and the README.
 export function commandLine(settings) {
-  return `POST ${OPENROUTER_URL}  {"model": "<model>", "messages": [system, user], "max_tokens": ${settings.maxTokens}, "reasoning": {"max_tokens": ${settings.reasoningTokens}}, "temperature": ${settings.temperature}, "usage": {"include": true}}`;
+  return `POST ${OPENROUTER_URL}  {"model": "<model>", "messages": [system, user], "max_tokens": ${settings.maxTokens}, "reasoning": ${JSON.stringify(reasoningOf(settings))}, "temperature": ${settings.temperature}, "usage": {"include": true}}`;
 }
 
 export function callOpenRouter({apiKey, contestant, system, prompt, settings, deadlineMs, rawFile, roundStartMs, onAnswer}) {
