@@ -1,0 +1,5 @@
+.env
+runs/
+node_modules/
+*.log
+config/local.json

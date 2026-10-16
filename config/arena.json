@@ -1,0 +1,66 @@
+{
+  "name": "deepseek-vs-kimi-vs-minimax",
+  "venue": "polymarket",
+  "slugPrefix": "btc-updown-5m-",
+  "windowSeconds": 300,
+  "windows": 72,
+  "maxWindowsAttempted": 96,
+  "snapshotSecond": 45,
+  "betCutoffSecond": 285,
+  "answerDeadlineSecond": 285,
+  "snapshot": {
+    "minuteMarks": 10,
+    "chainlinkRounds": 30
+  },
+  "betRule": "call",
+  "stakeUsd": 5,
+  "budgetUsd": 100,
+  "minShares": 5,
+  "fee": {
+    "rate": 0.07,
+    "exponent": 1,
+    "source": "Polymarket taker fee for crypto markets: shares x 0.07 x price x (1 - price), https://docs.polymarket.com/trading/fees"
+  },
+  "seed": 20261016,
+  "contestants": [
+    {
+      "id": "deepseek",
+      "provider": "openrouter",
+      "model": "deepseek/deepseek-v4-pro-0813",
+      "modelLabel": "DeepSeek V4 Pro",
+      "company": "DeepSeek"
+    },
+    {
+      "id": "kimi",
+      "provider": "openrouter",
+      "model": "moonshotai/kimi-k3",
+      "modelLabel": "Kimi K3",
+      "company": "Moonshot AI"
+    },
+    {
+      "id": "minimax",
+      "provider": "openrouter",
+      "model": "minimax/minimax-m3",
+      "modelLabel": "MiniMax M3",
+      "company": "MiniMax"
+    }
+  ],
+  "blocks": {
+    "pauseAfterVoidedInARow": 1,
+    "defaultPauseSeconds": 600,
+    "maxPauseSeconds": 19800
+  },
+  "settlement": {
+    "bookReadSecondsAfterClose": 20,
+    "venuePollSeconds": 30,
+    "venueGiveUpSeconds": 3600
+  },
+  "dashboardPort": 8831,
+  "openrouter": {
+    "maxTokens": 2560,
+    "reasoningTokens": 1536,
+    "temperature": 0.2,
+    "spendCapUsd": 5,
+    "note": "The same request for all three: one system and one user message, no tools. max_tokens caps the whole reply; reasoning.max_tokens caps the thinking inside it. The run stops before a window would take total spend past spendCapUsd."
+  }
+}

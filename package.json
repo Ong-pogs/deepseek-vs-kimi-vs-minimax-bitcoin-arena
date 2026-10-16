@@ -1,0 +1,20 @@
+{
+  "name": "claude-vs-claude-bitcoin-arena",
+  "version": "1.0.0",
+  "description": "Nine versions of Claude (three models, three effort levels) get the same Predictefy snapshot of Polymarket's 5-minute Bitcoin market and paper-trade it under one set of rules.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "engines": { "node": ">=22.12" },
+  "scripts": {
+    "check": "node src/cli.mjs check",
+    "pilot": "node src/cli.mjs pilot",
+    "start": "node src/cli.mjs start",
+    "launch": "node src/cli.mjs launch",
+    "resume": "node src/cli.mjs resume",
+    "status": "node src/cli.mjs status",
+    "stop": "node src/cli.mjs stop",
+    "dashboard": "node src/cli.mjs dashboard",
+    "test": "node --test"
+  }
+}
