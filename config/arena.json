@@ -60,7 +60,7 @@
     "maxTokens": 2560,
     "reasoningTokens": 1536,
     "temperature": 0.2,
-    "spendCapUsd": 5,
+    "spendCapUsd": 10,
     "note": "The same request for all three: one system and one user message, no tools. max_tokens caps the whole reply; reasoning.max_tokens caps the thinking inside it. The run stops before a window would take total spend past spendCapUsd."
   }
 }
