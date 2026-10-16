@@ -14,9 +14,12 @@ import path from 'node:path';
 
 export const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-export function requestBody({model, system, prompt, settings}) {
+// providerIgnore: providers measured to ignore "thinking off" (they think until max_tokens and return no answer), or
+// to fail; OpenRouter routes among all the others exactly as for every other model.
+export function requestBody({model, system, prompt, settings, providerIgnore = []}) {
   return {
     model,
+    ...(providerIgnore.length ? {provider: {ignore: providerIgnore}} : {}),
     messages: [{role: 'system', content: system}, {role: 'user', content: prompt}],
     max_tokens: settings.maxTokens,
     reasoning: reasoningOf(settings),
@@ -40,7 +43,7 @@ export function callOpenRouter({apiKey, contestant, system, prompt, settings, de
     };
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), Math.max(0, deadlineMs - Date.now()));
-    const body = requestBody({model: contestant.model, system, prompt, settings});
+    const body = requestBody({model: contestant.model, system, prompt, settings, providerIgnore: contestant.providerIgnore || []});
     (async () => {
       let response, data = null, rawText = '';
       try {

@@ -28,21 +28,32 @@
       "provider": "openrouter",
       "model": "deepseek/deepseek-v4-pro-0813",
       "modelLabel": "DeepSeek V4 Pro",
-      "company": "DeepSeek"
+      "company": "DeepSeek",
+      "providerIgnore": [
+        "Phala",
+        "StreamLake"
+      ]
     },
     {
       "id": "kimi",
       "provider": "openrouter",
       "model": "moonshotai/kimi-k3",
       "modelLabel": "Kimi K3",
-      "company": "Moonshot AI"
+      "company": "Moonshot AI",
+      "providerIgnore": []
     },
     {
       "id": "minimax",
       "provider": "openrouter",
       "model": "minimax/minimax-m3",
       "modelLabel": "MiniMax M3",
-      "company": "MiniMax"
+      "company": "MiniMax",
+      "providerIgnore": [
+        "Together",
+        "Parasail",
+        "Novita",
+        "AtlasCloud"
+      ]
     }
   ],
   "blocks": {
@@ -62,5 +73,6 @@
     "temperature": 0.2,
     "spendCapUsd": 10,
     "note": "The same request for all three: one system and one user message, no tools, thinking off (reasoning.enabled false). max_tokens caps the reply. The run stops before a window would take total spend past spendCapUsd."
-  }
+  },
+  "providerCheck": "2026-10-16: every OpenRouter provider of each model was sent the real prompt with thinking off. MiniMax M3 on Together, Parasail and Novita (and DeepSeek V4 Pro on Phala) thought anyway until max_tokens and returned no answer; AtlasCloud (MiniMax) errored and StreamLake (DeepSeek) took 48 s. Those are skipped; all other providers answered in 1-7 s with no thinking."
 }
