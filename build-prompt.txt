@@ -1,0 +1,18 @@
+Build a Node.js (22.12+, no dependencies) arena that puts three AI models against each other on Polymarket's 5-minute "Bitcoin Up or Down" market, using the Predictefy API for every market fact and OpenRouter for every model call.
+
+Models (OpenRouter ids): deepseek/deepseek-v4-pro-0813, moonshotai/kimi-k3, minimax/minimax-m3.
+
+Every 5-minute window:
+1. Find the window's market through Predictefy: GET https://data.predictefy.com/api/polymarket/fetchMarkets?slug=btc-updown-5m-{window start unix seconds} (Authorization: Bearer PREDICTEFY_API_KEY).
+2. At 45 seconds into the window, take one snapshot through Predictefy: the Up and Down order books (GET /api/polymarket/fetchOrderBook?outcomeId=...) and the last 30 Chainlink BTC/USD rounds (GET /api/feeds/chainlink/fetchOracleHistory?symbol=BTC/USD&limit=30). Work out in code: Bitcoin's price at the open and now, the change since the open, best bid and ask on each side, and what the stake would buy on each side at the asks.
+3. Send all three models the same prompt at the same instant through OpenRouter (POST https://openrouter.ai/api/v1/chat/completions) with one system and one user message, max_tokens 1024, reasoning {enabled: false}, temperature 0.2, usage {include: true}. Ask for one JSON object: {"p_up": 0..1, "call": "up" | "down" | "skip", "reason": "one sentence"}. Skip OpenRouter providers that ignore thinking-off (they think until max_tokens and return no answer); measure this with a one-call test per provider first.
+4. When an answer arrives (deadline 285 seconds into the window), fill a $50 paper bet from a $1,000 bankroll: read the order book again through Predictefy and walk the asks until $50 is spent, never past displayed depth, plus Polymarket's taker fee (shares x 0.07 x price x (1 - price)). Label every fill "simulated at the live Predictefy order book".
+5. After the window closes, settle on Polymarket's published result, and cross-check it against Predictefy's last order book and the Chainlink feed.
+6. Score every model on every window: hit rate, Brier score, paper profit. Run three non-AI baselines on the same snapshot and stake: a seeded random pick, the market favourite, and Bitcoin's direction since the open.
+
+Also:
+- Log every Predictefy call with its credits (market 1, order book 5, Chainlink rounds 2) and every OpenRouter call with its cost (usage.cost). Stop before total OpenRouter spend would pass a cap (default $10).
+- Keep all state on disk so a run can stop and resume; throw out a window for everyone if any call fails for a reason that is not the model's.
+- Serve a dashboard on port 8831: one card per model (hit rate, Brier, profit, missed, median answer time), the baselines, a luck check (coin-flip band over the counted windows), with/against the favourite, an equity chart, every window with each model's answer and reason, the Predictefy calls behind one snapshot, and the rules, the exact request and the running bill.
+- CLI: check (one live snapshot, no model calls), pilot (short trial), launch, status, stop, resume, dashboard.
+- Keys in .env (PREDICTEFY_API_KEY, OPENROUTER_API_KEY), never printed; an .env.example with placeholders.

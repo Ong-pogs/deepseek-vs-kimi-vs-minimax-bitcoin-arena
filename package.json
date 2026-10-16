@@ -1,11 +1,13 @@
 {
-  "name": "claude-vs-claude-bitcoin-arena",
+  "name": "deepseek-vs-kimi-vs-minimax-bitcoin-arena",
   "version": "1.0.0",
-  "description": "Nine versions of Claude (three models, three effort levels) get the same Predictefy snapshot of Polymarket's 5-minute Bitcoin market and paper-trade it under one set of rules.",
+  "description": "DeepSeek V4 Pro, Kimi K3 and MiniMax M3 get the same Predictefy snapshot of Polymarket's 5-minute Bitcoin market through OpenRouter and paper-trade it under one set of rules.",
   "type": "module",
   "private": true,
   "license": "MIT",
-  "engines": { "node": ">=22.12" },
+  "engines": {
+    "node": ">=22.12"
+  },
   "scripts": {
     "check": "node src/cli.mjs check",
     "pilot": "node src/cli.mjs pilot",
