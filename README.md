@@ -2,10 +2,10 @@
 
 Three flagship AI models from China's three AI labs, DeepSeek V4 Pro, Kimi K3 (Moonshot AI) and MiniMax M3, get the same Predictefy snapshot of Polymarket's 5-minute "Bitcoin Up or Down" market. They answer under one set of rules and paper-trade it, window after window.
 
-**Built on [Predictefy](https://predictefy.com/en)**, the unified prediction market API: one key for Polymarket, Kalshi and 14 more venues. See the [API](https://predictefy.com/en/api?utm_source=github&utm_medium=repo&utm_campaign=deepseek-vs-kimi-vs-minimax&utm_content=readme-top), the [docs](https://docs.predictefy.com/), the [quickstart](https://docs.predictefy.com/quickstart/), [pricing](https://predictefy.com/en/pricing) and the [blog](https://blog.predictefy.com).
+**Built on [Predictefy](https://predictefy.com/en)**, the unified prediction market API: one key for Polymarket, Kalshi and 14 more venues. See the [API](https://predictefy.com/en/prediction-market-api?utm_source=github&utm_medium=repo&utm_campaign=deepseek-vs-kimi-vs-minimax&utm_content=readme-top), the [docs](https://docs.predictefy.com/), the [quickstart](https://docs.predictefy.com/quickstart/), [pricing](https://predictefy.com/en/pricing) and the [blog](https://blog.predictefy.com).
 
 - **Same request for all three.** Every call goes through OpenRouter with one system message and one user message. There are no tools, no web search, no memory of earlier rounds, and thinking is off (`reasoning: {enabled: false}`). Only `"model"` changes.
-- **Every fact from Predictefy.** At 45 seconds into each window, one snapshot reads the market, both order books and Chainlink's BTC/USD rounds through the [Predictefy API](https://predictefy.com/en/api?utm_source=github&utm_medium=repo&utm_campaign=deepseek-vs-kimi-vs-minimax&utm_content=readme): 4 calls, 13 credits.
+- **Every fact from Predictefy.** At 45 seconds into each window, one snapshot reads the market, both order books and Chainlink's BTC/USD rounds through the [Predictefy API](https://predictefy.com/en/prediction-market-api?utm_source=github&utm_medium=repo&utm_campaign=deepseek-vs-kimi-vs-minimax&utm_content=readme): 4 calls, 13 credits.
 - **Paper bets at the live order book.** A call of up or down is a flat $50 bet from a $1,000 paper bankroll. It fills at the asks read through Predictefy when the answer arrives, plus Polymarket's taker fee, and settles on Polymarket's published result. No real orders and no wallet.
 - **Three plain rules** play alongside: a random pick, the market favourite, and Bitcoin's direction since the open.
 - **A spend cap.** The run stops before OpenRouter spend would pass the cap in `config/arena.json` (default $10).
@@ -47,7 +47,7 @@ The models, caps, stake, bankroll and number of windows are in `config/arena.jso
 
 **Product**
 - [Predictefy](https://predictefy.com/en): the prediction market terminal and API
-- [Prediction Market API](https://predictefy.com/en/api?utm_source=github&utm_medium=repo&utm_campaign=deepseek-vs-kimi-vs-minimax&utm_content=readme-links): one API for every venue
+- [Prediction Market API](https://predictefy.com/en/prediction-market-api?utm_source=github&utm_medium=repo&utm_campaign=deepseek-vs-kimi-vs-minimax&utm_content=readme-links): one API for every venue
 - [Markets](https://predictefy.com/en/markets) · [Analytics](https://predictefy.com/en/analytics) · [Arbitrage terminal](https://predictefy.com/en/arbitrage) · [Positive EV](https://predictefy.com/en/price-gap) · [Calculators](https://predictefy.com/en/calculators) · [Build](https://predictefy.com/en/build)
 - [Pricing and plans](https://predictefy.com/en/pricing) · [Get an API key](https://portal.predictefy.com/keys)
 
