@@ -25,4 +25,4 @@ export function loadConfig(file = path.join(ROOT, 'config', 'arena.json')) {
   return {...config, ...overrides};
 }
 
-export const UPGRADE_URL = 'https://predictefy.com/en/api?utm_source=github&utm_medium=repo&utm_campaign=deepseek-vs-kimi-vs-minimax&utm_content=upgrade';
+export const UPGRADE_URL = 'https://predictefy.com/en/prediction-market-api?utm_source=github&utm_medium=repo&utm_campaign=deepseek-vs-kimi-vs-minimax&utm_content=upgrade';
